@@ -64,7 +64,7 @@ test_that("duckdb_write_and_replace_table_from_R erstatter tabell", {
   con <- local_test_duckdb()
   DBI::dbExecute(con, "CREATE TABLE testtab AS SELECT 1 AS a")
   dt <- data.table::data.table(b = c(10, 20))
-  duckdb_write_and_replace_table_from_R(con = con, table = "testtab", data = dt)
+  duckdb_write_and_replace_table_from_R(con = con, tablename = "testtab", data = dt)
   expect_identical(duckdb_get_columns(con, "testtab"), "b")
   expect_equal(nrow(duckdb_fetch_table(con, "testtab")),2)
 })

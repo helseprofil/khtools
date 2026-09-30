@@ -4,12 +4,12 @@
 \alias{duckdb_write_and_replace_table_from_R}
 \title{duckdb_write_and_replace_table}
 \usage{
-duckdb_write_and_replace_table_from_R(con, table, data, temporary = TRUE)
+duckdb_write_and_replace_table_from_R(con, tablename, data, temporary = TRUE)
 }
 \arguments{
 \item{con}{db connection}
 
-\item{table}{tabellen som skal erstattes}
+\item{tablename}{tabellen som skal erstattes}
 
 \item{data}{data.frame eller data.table som skal skrives}
 

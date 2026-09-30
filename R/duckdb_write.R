@@ -74,13 +74,13 @@ duckdb_replace_table <- function(con, target, source){
 #' og skal skrives tilbake uten å overskrive tabellen med seg selv som kan være ustabilt.
 #'
 #' @param con db connection
-#' @param table tabellen som skal erstattes
+#' @param tablename tabellen som skal erstattes
 #' @param data data.frame eller data.table som skal skrives
 #' @param temporary om tmp-tabellen skal være temporary
 #' @family duckdb
 #' @export
-duckdb_write_and_replace_table_from_R <- function(con, table, data, temporary = TRUE){
-  tmp_table <- sprintf("%s___tmp_result", table)
+duckdb_write_and_replace_table_from_R <- function(con, tablename, data, temporary = TRUE){
+  tmp_table <- sprintf("%s___tmp_result", tablename)
   duckdb_drop_tables(con, tmp_table)
   duckdb_write_table(
     con = con,
@@ -92,7 +92,7 @@ duckdb_write_and_replace_table_from_R <- function(con, table, data, temporary = 
   
   duckdb_replace_table(
     con = con,
-    target = table,
+    target = tablename,
     source = tmp_table
   )
   
