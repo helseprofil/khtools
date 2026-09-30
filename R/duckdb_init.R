@@ -9,8 +9,9 @@
 #' @return en databaseconnection
 #' @family duckdb
 #' @export
-duckdb_init <- function(dbname = NULL, mem_limit_gb = 8){
+duckdb_init <- function(dbname = NULL, mem_limit_gb = NULL){
   if(is.null(dbname)) stop("du må gi databasen et navn ved å sette dbname")
+  if(is.null(mem_limit_gb)) mem_limit_gb <- 8
   duckdir <- file.path(fs::path_home(), "helseprofil", "duck")
   fs::dir_create(duckdir)
   db <- file.path(duckdir, paste0(dbname, ".duckdb"))
