@@ -98,9 +98,10 @@ duckdb_write_and_replace_table_from_R <- function(con, table, data, temporary = 
   invisible(NULL)
 }
 
-#' @title duckdb_create_and_replace_table
+#' @title duckdb_replace_existing_table
 #' @description
-#' Erstatter CREATE OR REPLACE X AS SELECT FROM X, ved at det først
+#' Oppdaterer en eksisterende tabell basert på et SELECT-uttrykk. 
+#' Gir en tryggere vei rundt CREATE OR REPLACE X AS SELECT FROM X, ved at det først
 #' skrives en tmp_tabell, som deretter overskriver måltabellen. 
 #'
 #' @param con db connection
@@ -108,21 +109,43 @@ duckdb_write_and_replace_table_from_R <- function(con, table, data, temporary = 
 #' @param select_sql uttrykk som genererer den nye tabellen
 #' @family duckdb
 #' @export
-duckdb_create_and_replace_table <- function(con, target, select_sql){
+duckdb_replace_existing_table <- function(con, target, select_sql){
+  if(!duckdb_table_exists(con, target)){
+    stop(sprintf("Target-tabell '%s' finnes ikke. Bruk duckdb_create_new_table() dersom tabellen skal opprettes.", 
+                 target))
+  }
   tmp_table <- sprintf("%s___tmp_result", target)
   duckdb_drop_tables(con, tmp_table)
   
   invisible(
-    DBI::dbExecute(
-      con,
-      sprintf(
-        "CREATE TABLE %s AS %s",
-        sql_quote_I(con, tmp_table),
-        select_sql
-      )
-    )
+    DBI::dbExecute(con, sprintf(
+      "CREATE TABLE %s AS %s", 
+      sql_quote_I(con, tmp_table), select_sql))
   )
   
   duckdb_replace_table(con = con, target = target, source = tmp_table)
+  invisible(NULL)
+}
+
+#' @title duckdb_create_new_table
+#' @description
+#' Oppretter en ny tabell basert på et SELECT-uttrykk
+#'
+#' @param con db connection
+#' @param target navn på måltabell
+#' @param select_sql uttrykk som genererer den nye tabellen
+#' @family duckdb
+#' @export
+duckdb_create_new_table <- function(con, target, select_sql){
+  if(duckdb_table_exists(con, target)){
+    stop(sprintf("Target-tabell '%s' finnes. Bruk duckdb_replace_existing_table() dersom tabellen skal oppdateres.", 
+                 target))
+  }
+
+  invisible(
+    DBI::dbExecute(con, sprintf(
+        "CREATE TABLE %s AS %s", 
+        sql_quote_I(con, target), select_sql))
+  )
   invisible(NULL)
 }

@@ -90,7 +90,7 @@ duckdb_merge_tables <- function(con, mergeto, mergefrom, join_cols = NULL, resul
   )
   
   if(identical(result, mergeto)){
-    duckdb_create_and_replace_table(con = con, target = result, select_sql = select_sql)
+    duckdb_replace_existing_table(con = con, target = result, select_sql = select_sql)
   } else {
     duckdb_drop_tables(con, result)
     invisible(

@@ -61,23 +61,68 @@ test_that("duckdb_write_and_replace_table_from_R erstatter tabell", {
 })
 
 # create_and_replace_table ----
-test_that("duckdb_create_and_replace_table erstatter tabell fra query", {
+test_that("duckdb_replace_existing_table erstatter tabell fra query", {
   con <- local_test_duckdb()
   DBI::dbExecute(con, "CREATE TABLE testtab AS SELECT 1 AS a")
-  duckdb_create_and_replace_table(con = con, target = "testtab", select_sql = "SELECT 2 AS b")
+  duckdb_replace_existing_table(con = con, target = "testtab", select_sql = "SELECT 2 AS b")
   expect_identical(duckdb_get_columns(con, "testtab"), "b")
   dt <- duckdb_fetch_table(con, "testtab")
   expect_equal(dt$b,2)
 })
 
-test_that("duckdb_create_and_replace_table kan bruke target i select", {
+test_that("duckdb_replace_existing_table kan bruke target i select", {
   con <- local_test_duckdb()
   DBI::dbExecute(con, "CREATE TABLE testtab AS SELECT * FROM range(100)")
-  duckdb_create_and_replace_table(
+  duckdb_replace_existing_table(
     con = con,
     target = "testtab",
     select_sql = sprintf("SELECT * FROM %s LIMIT 10",sql_quote_I(con, "testtab"))
   )
-  
   expect_equal(nrow(duckdb_fetch_table(con, "testtab")),10)
+})
+
+test_that("duckdb_replace_existing_table feiler dersom target ikke finnes", {
+  con <- local_test_duckdb()
+  expect_error(
+    duckdb_replace_existing_table(con = con, 
+                                    target = "finnes_ikke", 
+                                    select_sql = "SELECT 1 AS a"),
+    "finnes ikke"
+  )
+})
+
+# create_table ----
+test_that("duckdb_create_table oppretter ny tabell", {
+  con <- local_test_duckdb()
+  
+  duckdb_create_new_table(con = con,
+                          target = "testtab",
+                          select_sql = "SELECT 1 AS a")
+  
+  expect_true(duckdb_table_exists(con, "testtab"))
+  expect_identical(duckdb_get_columns(con, "testtab"), "a")
+})
+
+test_that("duckdb_create_table oppretter tabell med korrekt innhold", {
+  con <- local_test_duckdb()
+  duckdb_create_new_table(con = con, 
+                          target = "testtab", 
+                          select_sql = "SELECT 1 AS a, 'x' AS b")
+  
+  dt <- duckdb_fetch_table(con, "testtab")
+  
+  expect_equal(nrow(dt), 1)
+  expect_identical(names(dt), c("a", "b"))
+})
+
+test_that("duckdb_create_table feiler dersom target allerede finnes", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE testtab AS SELECT 1 AS a")
+  
+  expect_error(duckdb_create_new_table(con = con, 
+                                       target = "testtab", 
+                                       select_sql = "SELECT 2 AS b"),
+    "finnes"
+  )
+  
 })
