@@ -33,6 +33,15 @@ test_that("duckdb_drop_tables håndterer flere tabeller", {
   expect_setequal(duckdb_get_tables(con),character())
 })
 
+test_that("duckdb_drop_tables gjør ingenting for character(0) eller NULL", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE testtab AS SELECT 1 AS a")
+  expect_no_error(duckdb_drop_tables(con, character(0)))
+  expect_true(duckdb_table_exists(con, "testtab"))
+  expect_no_error(duckdb_drop_tables(con, NULL))
+  expect_true(duckdb_table_exists(con, "testtab"))
+})
+
 # replace_table ----
 test_that("duckdb_replace_table erstatter target med source", {
   con <- local_test_duckdb()
@@ -60,7 +69,7 @@ test_that("duckdb_write_and_replace_table_from_R erstatter tabell", {
   expect_equal(nrow(duckdb_fetch_table(con, "testtab")),2)
 })
 
-# create_and_replace_table ----
+# replace_existing_table ----
 test_that("duckdb_replace_existing_table erstatter tabell fra query", {
   con <- local_test_duckdb()
   DBI::dbExecute(con, "CREATE TABLE testtab AS SELECT 1 AS a")

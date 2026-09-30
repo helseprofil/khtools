@@ -27,6 +27,7 @@ duckdb_write_table <- function(con, tablename, data, temp = TRUE, overwrite = TR
 #' @family duckdb
 #' @export
 duckdb_drop_tables <- function(con, tables){
+  if(is.null(tables) || length(tables) == 0L) return(invisible(NULL))
   tables <- sql_quote_I(con, tables)
   sql <- paste(
     sprintf("DROP TABLE IF EXISTS %s", tables),
