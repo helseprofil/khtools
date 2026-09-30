@@ -1,0 +1,15 @@
+Package: khtools
+Title: Verktøy som brukes på tvers i produksjonsapparatet
+Version: 0.0.0.9000
+Authors@R: 
+    person("Vegard", "Lysne",, "vegard.lysne@helsedir.no", role = c("aut", "cre"))
+Description: Funksjoner som brukes på tvers av produksjonsapparatet
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    data.table
+Config/roxygen2/version: 8.1.0

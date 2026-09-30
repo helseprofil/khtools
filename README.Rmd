@@ -1,0 +1,41 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# khtools
+
+<!-- badges: start -->
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![GitHub last commit](https://img.shields.io/github/last-commit/helseprofil/khtools)](https://github.com/helseprofil/khtools/commits)
+[![GitHub issues](https://img.shields.io/github/issues/helseprofil/khtools)](https://github.com/helseprofil/khtools/issues)
+[![GitHub R package version(branch)](https://img.shields.io/github/r-package/v/helseprofil/khfunctions/main)](https://github.com/helseprofil/khtools)
+<!-- badges: end -->
+
+Khtools er en verktøykasse som inneholder nyttige funksjoner som brukes på tvers i produksjonsapparatet for folkehelse- og oppvekstprofiler. 
+
+Dette inkluderer funksjoner for å sette options i R, opprette/lese/skrive til databaser, og annen relevant felles funksjonalitet. 
+
+## Installer
+
+Khtools kan installeres fra [GitHub](https://github.com/) med:
+
+``` r
+# install.packages("pak")
+pak::pak("helseprofil/khtools")
+```
+
+``` r
+# install.packages("remotes")
+remotes::install_github("helseprofil/khtools")
+```
