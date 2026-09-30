@@ -12,7 +12,7 @@ commit](https://img.shields.io/github/last-commit/helseprofil/khtools)](https://
 [![GitHub
 issues](https://img.shields.io/github/issues/helseprofil/khtools)](https://github.com/helseprofil/khtools/issues)
 [![GitHub R package
-version(branch)](https://img.shields.io/github/r-package/v/helseprofil/khfunctions/main)](https://github.com/helseprofil/khtools)
+version(branch)](https://img.shields.io/github/r-package/v/helseprofil/khtools/main)](https://github.com/helseprofil/khtools)
 <!-- badges: end -->
 
 Khtools er en verktøykasse som inneholder nyttige funksjoner som brukes
