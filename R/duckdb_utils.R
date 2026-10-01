@@ -108,3 +108,36 @@ duckdb_merge_tables <- function(con, mergeto, mergefrom, join_cols = NULL, resul
   
   invisible(NULL)
 }
+
+#' @title duckdb_append_table
+#' @description
+#' Legger rader fra én tabell inn i en annen, matchet på kolonnenavn.
+#' Dersom tabellene har ulike kolonner, opprettes disse med riktig type
+#' først. 
+#' Funksjonen imiterer derfor data.table::rbindlist med use.names = TRUE og fill = TRUE
+#' @param con db connection
+#' @param target måltabell
+#' @param source kildetabell
+#' @family duckdb
+#' @export
+duckdb_append_table <- function(con, target, source){
+  target_types <- duckdb_get_column_types(con, target)
+  source_types <- duckdb_get_column_types(con, source)
+  target_missing <- setdiff(names(source_types), names(target_types))
+  source_missing <- setdiff(names(target_types), names(source_types))
+  
+  if(length(target_missing)){
+    duckdb_ensure_columns(con, target, cols = source_types[target_missing])
+  }
+  
+  if(length(source_missing)){
+    duckdb_ensure_columns(con, source, cols = target_types[source_missing])
+  }
+  
+  DBI::dbExecute(
+    con, sprintf("INSERT INTO %s BY NAME SELECT * FROM %s", 
+                 sql_quote_I(con, target), sql_quote_I(con, source))
+  )
+  
+  invisible(NULL)
+}

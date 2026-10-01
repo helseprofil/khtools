@@ -30,6 +30,38 @@ test_that("duckdb_get_columns feiler for ukjent tabell", {
   expect_error(duckdb_get_columns(con, "finnes_ikke"))
 })
 
+# get_column_types ----
+
+test_that("duckdb_get_column_types returnerer navngitt vektor med typer", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE testtab (id INTEGER, navn VARCHAR, verdi DOUBLE)")
+  types <- duckdb_get_column_types(con, "testtab")
+  expect_type(types, "character")
+  expect_identical(names(types), c("id", "navn", "verdi"))
+  expect_identical(unname(types), c("INTEGER", "VARCHAR", "DOUBLE"))
+})
+
+test_that("duckdb_get_column_types feiler dersom tabellen ikke finnes", {
+  con <- local_test_duckdb()
+  expect_error(duckdb_get_column_types(con, "finnes_ikke"), "finnes ikke")
+})
+
+test_that("duckdb_get_column_types kan brukes direkte i duckdb_ensure_columns", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE source (id INTEGER, navn VARCHAR)")
+  DBI::dbExecute(con, "CREATE TABLE target (id INTEGER)")
+  types <- duckdb_get_column_types(con, "source")
+  duckdb_ensure_columns(con, "target", types["navn"])
+  expect_setequal(duckdb_get_columns(con, "target"), c("id", "navn"))
+})
+
+test_that("duckdb_get_column_types fungerer for tom tabell", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE testtab (id INTEGER, txt VARCHAR)")
+  types <- duckdb_get_column_types(con, "testtab")
+  expect_identical(types, c(id = "INTEGER", txt = "VARCHAR"))
+})
+
 # fetch_table ----
 test_that("duckdb_fetch_table returnerer data.table", {
   con <- local_test_duckdb()

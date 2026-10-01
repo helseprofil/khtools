@@ -25,6 +25,20 @@ duckdb_get_columns <- function(con, tablename){
   DBI::dbListFields(con, tablename)
 }
 
+#' @title duckdb_get_column_types
+#' @description
+#' Henter kolonnetyper fra en DuckDB-tabell.
+#'
+#' @param con db connection
+#' @param table tabellnavn
+#' @family duckdb
+#' @export
+duckdb_get_column_types <- function(con, table){
+  if(!duckdb_table_exists(con, table)) stop(sprintf("Tabell '%s' finnes ikke", table))
+  desc <- DBI::dbGetQuery(con, sprintf("DESCRIBE %s", sql_quote_I(con, table)))
+  stats::setNames(desc$column_type, desc$column_name  )
+}
+
 #' @title duckdb_get_tables
 #' @description DBI::dbListTables
 #' @param con db connection

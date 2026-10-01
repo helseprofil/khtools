@@ -85,3 +85,80 @@ test_that("duckdb_merge_tables krever join_cols", {
 test_that("duckdb_merge_tables feiler om result = mergefrom", {
   expect_error(duckdb_merge_tables(con, mergeto = "a", mergefrom = "b", result = "b", join_cols = "id"), "mergefrom")
 })
+
+# append_table ----
+test_that("duckdb_append_table legger til rader", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE target AS SELECT 1 AS id")
+  DBI::dbExecute(con, "CREATE TABLE source AS SELECT 2 AS id")
+  duckdb_append_table(con, target = "target", source = "source")
+  dt <- duckdb_fetch_table(con, "target")
+  expect_equal(nrow(dt), 2)
+  expect_setequal(dt$id, c(1, 2))
+})
+
+test_that("duckdb_append_table bruker BY NAME", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE target (id INTEGER, txt VARCHAR)")
+  DBI::dbExecute(con, "CREATE TABLE source AS SELECT 'abc' AS txt, 1 AS id")
+  
+  duckdb_append_table(con, target = "target", source = "source")
+  dt <- duckdb_fetch_table(con, "target")
+  expect_equal(dt$id, 1)
+  expect_equal(dt$txt, "abc")
+})
+
+test_that("duckdb_append_table krever at target finnes", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE source AS SELECT 1 AS id")
+  expect_error(duckdb_append_table(con, target = "target", source = "source"), "'target' finnes ikke")
+})
+
+test_that("duckdb_append_table krever at source finnes", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE target AS SELECT 1 AS id")
+  expect_error(duckdb_append_table(con, target = "target", source = "source"), "'source' finnes ikke")
+})
+
+test_that("duckdb_append_table håndterer tom source-tabell", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE target AS SELECT 1 AS id")
+  DBI::dbExecute(con, "CREATE TABLE source AS SELECT 1 AS id WHERE FALSE")
+  duckdb_append_table(con, target = "target", source = "source")
+  expect_equal(nrow(duckdb_fetch_table(con, "target")), 1)
+})
+
+test_that("duckdb_append_table legger til kolonner som kun finnes i source", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE target AS SELECT 1 AS A")
+  DBI::dbExecute(con, "CREATE TABLE source AS SELECT 2 AS A, 100 AS B")
+  duckdb_append_table(con, target = "target", source = "source")
+  dt <- duckdb_fetch_table(con, "target")
+  expect_setequal(names(dt), c("A", "B"))
+  expect_equal(nrow(dt), 2)
+  expect_true(is.na(dt$B[1]))
+  expect_equal(dt$B[2], 100)
+})
+
+test_that("duckdb_append_table legger til kolonner som kun finnes i target", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE target AS SELECT 1 AS A, 10 AS B")
+  DBI::dbExecute(con, "CREATE TABLE source AS SELECT 2 AS A")
+  duckdb_append_table(con, target = "target", source = "source")
+  dt <- duckdb_fetch_table(con, "target")
+  expect_setequal(names(dt), c("A", "B"))
+  expect_equal(nrow(dt), 2)
+  expect_true(is.na(dt$B[2]))
+})
+
+test_that("duckdb_append_table håndterer kolonner som finnes i begge retninger", {
+  con <- local_test_duckdb()
+  DBI::dbExecute(con, "CREATE TABLE target AS SELECT 1 AS A, 10 AS B")
+  DBI::dbExecute(con, "CREATE TABLE source AS SELECT 2 AS A, 20 AS C")
+  duckdb_append_table(con, target = "target", source = "source")
+  dt <- duckdb_fetch_table(con, "target")
+  expect_setequal(names(dt), c("A", "B", "C"))
+  expect_equal(nrow(dt), 2)
+  expect_true(is.na(dt$C[1]))
+  expect_true(is.na(dt$B[2]))
+})
