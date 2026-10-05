@@ -49,3 +49,29 @@ package_update_available <- function(package, branch = "main", owner = "helsepro
   if(length(github_version) != 1L) return(FALSE)
   numeric_version(github_version) > numeric_version(installed_version)
 }
+
+#' @title check_package_update
+#' @description Gir brukeren anledning til å oppdatere pakker dersom ny versjon foreligger
+#' @keywords internal
+#' @noRd
+check_package_update <- function(package, branch = "main", owner = "helseprofil") {
+  
+  if(interactive() && 
+     package_update_available(package = package, branch = branch, owner = owner)){
+    
+    x <- utils::menu(title = sprintf("Update %s now?", package),
+                     choices = c("Yes", "No")
+                     )
+    
+    if(x == 1){
+      packageStartupMessage(
+        "Please restart your R session and then run:"
+      )
+      packageStartupMessage(
+        sprintf('remotes::install_github("%s/%s@%s")',
+                owner, package, branch))
+    }
+  }
+  
+  invisible()
+}

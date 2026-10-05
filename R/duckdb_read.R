@@ -5,11 +5,7 @@
 #' @family duckdb
 #' @export
 duckdb_table_exists <- function(con, tablename = NULL){
-  if(
-    is.null(tablename) ||
-    is.na(tablename) ||
-    !nzchar(tablename)
-  ){
+  if(is.null(tablename) || is.na(tablename) || !nzchar(tablename)){
     return(FALSE)
   }
   DBI::dbIsValid(con) && DBI::dbExistsTable(con, tablename)
