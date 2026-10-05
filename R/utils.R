@@ -12,6 +12,18 @@ msg <- function(..., .silent = getOption("khtools.silent", FALSE)){
   utils::flush.console()
 }
 
+#' @title header
+#' @description
+#' Skriver overskrift til konsoll og flusher output.
+#' @param ... objekter som skal skrives ut
+#' @param .silent mulighet til å skru av logging ved testing
+#' @family utilities
+#' @export
+header <- function(..., .silent = getOption("khtools.silent", FALSE)){
+  if(isTRUE(.silent)) return(invisible(NULL))
+  khtools::msg("\n# --", ..., "-- #\n")
+}
+
 #' @title sql_quote_I
 #' @description DBI::dbQuoteIdentifier
 #' @param con db connection

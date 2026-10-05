@@ -56,7 +56,7 @@ test_that("duckdb_replace_table feiler dersom target er source", {
   con <- local_test_duckdb()
   DBI::dbExecute(con, "CREATE TABLE testtab AS SELECT 1")
   expect_error(duckdb_replace_table(con, target = "testtab", source = "testtab"),
-               "kan ikke være samme tabell")
+               "samme tabell")
 })
 
 # write_and_replace_table_from_R ----

@@ -25,11 +25,11 @@ test_that("get_all_tabdims bruker korrekt SQL", {
                                          TAB2 = character(),
                                          TAB3 = character())
   )
+  mock_disconnect <- mockery::mock(NULL)
   
   mockery::stub(get_all_tabdims, "connect_khelsa", mock_connect)
   mockery::stub(get_all_tabdims, "DBI::dbGetQuery", mock_query)
   mockery::stub(get_all_tabdims, "DBI::dbDisconnect", mock_disconnect)
-  mock_disconnect <- mockery::mock(NULL)
   get_all_tabdims()
   sql <- mockery::mock_args(mock_query)[[1]][[2]]
   expect_match(sql, "SELECT TAB1, TAB2, TAB3")
