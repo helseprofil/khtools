@@ -12,7 +12,7 @@ test_that("get_all_tabdims returnerer unike sorterte dimensjoner", {
   mockery::stub(get_all_tabdims, "DBI::dbGetQuery", mock_query)
   mockery::stub(get_all_tabdims, "DBI::dbDisconnect", mock_disconnect)
   out <- get_all_tabdims()
-  expect_identical(out, c("AAR", "ALDER", "GEO", "KJONN"))
+  expect_identical(out, c("AAR", "ALDER", "GEO", "KJONN", "TAB1", "TAB2", "TAB3"))
   mockery::expect_called(mock_connect, 1)
   mockery::expect_called(mock_query, 1)
   mockery::expect_called(mock_disconnect, 1)

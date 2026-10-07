@@ -23,5 +23,5 @@ get_all_tabdims <- function(){
     WHERE VERSJONFRA <= #%s# AND VERSJONTIL > #%s#",
     date, date)))
   tabs <- data.table::melt(tabs, measure.vars = c("TAB1", "TAB2", "TAB3"))[!is.na(value), unique(value)]
-  sort(tabs)
+  sort(c(tabs, "TAB1", "TAB2", "TAB3"))
 }
