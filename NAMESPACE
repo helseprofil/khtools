@@ -20,6 +20,7 @@ export(duckdb_write_and_replace_table_from_R)
 export(duckdb_write_table)
 export(header)
 export(msg)
+export(read_pq)
 export(sql_quote_I)
 export(sql_quote_S)
 importFrom(data.table,

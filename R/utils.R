@@ -43,3 +43,15 @@ sql_quote_I <- function(con, x){
 sql_quote_S <- function(con, x){
   DBI::dbQuoteString(con, x)
 }
+
+#' @title read_pq
+#' @description
+#' Wrapper rundt data.table::setDT(arrow::read_parquet(...)). 
+#' Leser en parquet-fil inn i minnet og konverterer til data.table
+#' @param path filsti til parquetfilen
+#' @export
+read_pq <- function(path){
+  if(!grepl("\\.parquet$", path)) stop("path går ikke til en .parquet-fil")
+  if(!file.exists(path)) stop("Filen finnes ikke, eller kan ikke leses")
+  data.table::setDT(arrow::read_parquet(path))
+}
