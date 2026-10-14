@@ -4,24 +4,35 @@
 #' @description 
 #' Oppretter en arbeidsdatabase med en satt grense for RAM-bruk og sørger for at denne er tom
 #' Oppretter også en temp-database for eventuelt spilling til disk
+#' På FHP-VM-er lagres database og tempfiler på D:-disken ettersom C har lite plass
 #' @param dbname name of the duckdb-file
 #' @param mem_limit_gb grense for hvor mange GB RAM databasen får lov å benytte
 #' @return en databaseconnection
 #' @family duckdb
 #' @export
 duckdb_init <- function(dbname = NULL, mem_limit_gb = NULL){
+  hostname <- toupper(Sys.info()[["nodename"]])
   if(is.null(dbname)) stop("du må gi databasen et navn ved å sette dbname")
-  if(is.null(mem_limit_gb)) mem_limit_gb <- 8
+  
+  if(is.null(mem_limit_gb)){
+    mem_limit_gb <- ifelse(grepl("^POSL-SDIR-FHP", hostname), 32, 8)
+  }
+  
+  if(grepl("^POSL-SDIR-FHP", hostname)){
+    duckdir <- "D:/helseprofil/duck"
+  } else {
+    duckdir <- file.path(fs::path_home(), "helseprofil", "duck")
+  }
+  
   duckdir <- file.path(fs::path_home(), "helseprofil", "duck")
   fs::dir_create(duckdir)
   db <- file.path(duckdir, paste0(dbname, ".duckdb"))
   
   con <- DBI::dbConnect(duckdb::duckdb(shared_home = FALSE), dbdir = db)
-  invisible(DBI::dbExecute(con, 
-                           sprintf("SET memory_limit = '%sGB'", 
-                                   mem_limit_gb)))
+  invisible(DBI::dbExecute(con, sprintf("SET memory_limit = '%sGB'", mem_limit_gb)))
   
-  temp_dir <- file.path(tempdir(), "duckdb", "temp")
+  temp_dir <- file.path(duckdir, "temp")
+  if(fs::dir_exists(temp_dir)) fs::dir_delete(temp_dir)
   fs::dir_create(temp_dir)
   DBI::dbExecute(con, sprintf("SET temp_directory='%s'", gsub("\\\\", "/", temp_dir)))
   
@@ -54,10 +65,18 @@ duckdb_clean <- function(con){
 duckdb_shutdown <- function(con){
   if(is.null(con) || !DBI::dbIsValid(con)) return(invisible(NULL))
   dbfile <- DBI::dbGetInfo(con)$dbname
+  temp_dir <- tryCatch(
+    DBI::dbGetQuery(con, "SELECT current_setting('temp_directory') AS temp_directory")$temp_directory,
+    error = function(e) NULL
+  )
+  
   DBI::dbDisconnect(con, shutdown = TRUE)
   files <- c(dbfile, paste0(dbfile, ".wal"))
   files <- files[file.exists(files)]
   if(length(files) > 0) fs::file_delete(files)
+  if(!is.null(temp_dir) && fs::dir_exists(temp_dir)) {
+    fs::dir_delete(temp_dir)
+  }
   invisible(NULL)
 }
 
