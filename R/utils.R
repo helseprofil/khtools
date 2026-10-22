@@ -55,3 +55,26 @@ read_pq <- function(path){
   if(!file.exists(path)) stop("Filen finnes ikke, eller kan ikke leses")
   data.table::setDT(arrow::read_parquet(path))
 }
+
+#' @title convert_spss_to_parquet
+#' @description Leser en SPSS-fil og lagrer en parquetfil i samme mappe.
+#' @param orgpath sti til originalfil
+#' @param newname filnavn den nye parquetfilen skal få
+#' @export
+convert_spss_to_parquet <- function(orgpath, newname){
+  file <-try(foreign::read.spss(file = orgpath, use.value.labels = FALSE, max.value.labels = 0, as.data.frame = T), silent = T)
+  if(inherits(file, "try-error")) stop("Error when reading file: ", orgpath)
+  data.table::setDT(file)
+  
+  cols <- names(file)
+  empty <- cols == ""
+  if(any(empty)){
+    cols[empty] <- paste0("C", which(empty))
+    data.table::setnames(dt, cols)
+  }
+  
+  if(!grepl(".parquet$", newname)) newname <- paste0(newname, ".parquet")
+  dir <- dirname(orgpath)
+  newpath <- file.path(dir, newname)
+  arrow::write_parquet(file, newpath)
+}
