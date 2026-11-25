@@ -22,6 +22,7 @@ get_all_tabdims <- function(){
     "SELECT TAB1, TAB2, TAB3 FROM FILGRUPPER 
     WHERE VERSJONFRA <= #%s# AND VERSJONTIL > #%s#",
     date, date)))
-  tabs <- data.table::melt(tabs, measure.vars = c("TAB1", "TAB2", "TAB3"))[!is.na(value), unique(value)]
+  tabs <- data.table::melt(tabs, measure.vars = c("TAB1", "TAB2", "TAB3"))[["value"]]
+  tabs <- unique(tabs[!is.na(tabs)])
   sort(c(tabs, "TAB1", "TAB2", "TAB3"))
 }

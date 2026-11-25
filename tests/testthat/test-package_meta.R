@@ -127,3 +127,7 @@ test_that("package_update_available returns FALSE when version is missing", {
                 function(...) c("Package: khfunctions", "Title: test"))
   expect_false(package_update_available("khfunctions"))
 })
+
+test_that("package_update_available returns FALSE when package is not installed", {
+  expect_false(package_update_available("en_pakke_som_helt_sikkert_ikke_finnes"))
+})

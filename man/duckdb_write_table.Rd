@@ -26,7 +26,9 @@ Skriv eller overskriv eksisterende tabell i duckdb
 Other duckdb:
 \code{\link[=duckdb_append_table]{duckdb_append_table()}},
 \code{\link[=duckdb_clean]{duckdb_clean()}},
+\code{\link[=duckdb_connect]{duckdb_connect()}},
 \code{\link[=duckdb_create_new_table]{duckdb_create_new_table()}},
+\code{\link[=duckdb_disconnect]{duckdb_disconnect()}},
 \code{\link[=duckdb_drop_tables]{duckdb_drop_tables()}},
 \code{\link[=duckdb_ensure_columns]{duckdb_ensure_columns()}},
 \code{\link[=duckdb_fetch_table]{duckdb_fetch_table()}},
@@ -35,6 +37,8 @@ Other duckdb:
 \code{\link[=duckdb_get_tables]{duckdb_get_tables()}},
 \code{\link[=duckdb_init]{duckdb_init()}},
 \code{\link[=duckdb_merge_tables]{duckdb_merge_tables()}},
+\code{\link[=duckdb_opts]{duckdb_opts()}},
+\code{\link[=duckdb_path]{duckdb_path()}},
 \code{\link[=duckdb_replace_existing_table]{duckdb_replace_existing_table()}},
 \code{\link[=duckdb_replace_table]{duckdb_replace_table()}},
 \code{\link[=duckdb_save_file]{duckdb_save_file()}},

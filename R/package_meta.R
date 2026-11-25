@@ -40,7 +40,11 @@ package_options_are_default <- function(package, repo = "helseprofil/backend", b
 #' @keywords internal
 #' @noRd
 package_update_available <- function(package, branch = "main", owner = "helseprofil"){
-  installed_version <- utils::packageDescription(package)[["Version"]]
+  description <- suppressWarnings(utils::packageDescription(package))
+  if(length(description) == 1L && is.na(description)) return(FALSE)
+  
+  installed_version <- description[["Version"]]
+  if(is.null(installed_version)) return(FALSE)
   desc_url <- sprintf("https://raw.githubusercontent.com/%s/%s/%s/DESCRIPTION", owner, package, branch)
   
   txt <- tryCatch(readLines(desc_url, warn = FALSE), error = function(e) NULL)

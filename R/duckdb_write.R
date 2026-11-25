@@ -51,7 +51,7 @@ duckdb_drop_tables <- function(con, tables){
 #' @export
 duckdb_replace_table <- function(con, target, source){
   
-  if(identical(target, source)) stop("'target' og 'source' kan ikke være samme tabell")
+  if(identical(target, source)) stop("'target' og 'source' kan ikke v\u00e6re samme tabell")
   stopifnot(duckdb_table_exists(con, target))
   stopifnot(duckdb_table_exists(con, source))
   

@@ -6,7 +6,7 @@
 #' @family duckdb
 #' @export
 duckdb_ensure_columns <- function(con, table, cols){
-  if(is.null(names(cols))) stop("cols må være navngitt")
+  if(is.null(names(cols))) stop("cols m\u00e5 v\u00e6re navngitt")
   types <- as.character(unlist(cols, use.names = FALSE))
   
   sql <- paste(
@@ -42,8 +42,8 @@ duckdb_ensure_columns <- function(con, table, cols){
 #' @export
 duckdb_merge_tables <- function(con, mergeto, mergefrom, join_cols = NULL, result = NULL){
   if(is.null(result)) result <- mergeto 
-  if(identical(result, mergefrom)) stop("'result' kan ikke være identisk med 'mergefrom'")
-  if(is.null(join_cols)) stop("join_cols må spesifiseres. Automatisk valg av felles kolonner er ikke sikkert da verdikolonner kan finnes i begge tabeller.")
+  if(identical(result, mergefrom)) stop("'result' kan ikke v\u00e6re identisk med 'mergefrom'")
+  if(is.null(join_cols)) stop("join_cols m\u00e5 spesifiseres. Automatisk valg av felles kolonner er ikke sikkert da verdikolonner kan finnes i begge tabeller.")
   
   if(!duckdb_table_exists(con, mergeto)) stop(sprintf("Tabell '%s' finnes ikke", mergeto))
   if(!duckdb_table_exists(con, mergefrom)) stop(sprintf("Tabell '%s' finnes ikke", mergefrom))
@@ -63,7 +63,7 @@ duckdb_merge_tables <- function(con, mergeto, mergefrom, join_cols = NULL, resul
   join_cols <- valid_join_cols
   
   if(length(new_cols) == 0L){
-    msg(sprintf("- Ingen nye kolonner å merge fra %s til %s", mergefrom, mergeto))
+    msg(sprintf("- Ingen nye kolonner \u00e5 merge fra %s til %s", mergefrom, mergeto))
     return(invisible(NULL))
   }
   

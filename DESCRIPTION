@@ -1,20 +1,24 @@
 Package: khtools
 Title: Verktøy som brukes på tvers i produksjonsapparatet
-Version: 0.0.0.9003
+Version: 1.0.0
 Authors@R: 
     person("Vegard", "Lysne",, "vegard.lysne@helsedir.no", role = c("aut", "cre"))
-Description: Funksjoner som brukes på tvers av produksjonsapparatet
+Description: Funksjoner som brukes på tvers av produksjonsapparatet.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-Suggests: 
-    foreign,
-    testthat (>= 3.0.0),
-    withr
-Config/testthat/edition: 3
 Imports: 
     data.table (>= 1.18.4),
     DBI (>= 1.3.0),
     duckdb (>= 1.5.5),
-    httr2 (>= 1.3.0)
+    fs,
+    odbc,
+    yaml
+Suggests: 
+    arrow (>= 25.0.0),
+    foreign,
+    mockery,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0

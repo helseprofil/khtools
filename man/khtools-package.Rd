@@ -6,7 +6,7 @@
 \alias{khtools-package}
 \title{khtools: Verktøy som brukes på tvers i produksjonsapparatet}
 \description{
-Funksjoner som brukes på tvers av produksjonsapparatet
+Funksjoner som brukes på tvers av produksjonsapparatet.
 }
 \author{
 \strong{Maintainer}: Vegard Lysne \email{vegard.lysne@helsedir.no}
