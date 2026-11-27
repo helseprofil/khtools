@@ -71,58 +71,10 @@ get_config_options <- function(config_files, dynamic_options = list(),
                                                                    config_url, call. = FALSE)
     
     if("paths" %in% names(config)) {
-      path_queue <- list(
-        list(
-          values = config$paths,
-          prefix = paste(prefix, "paths", sep = "."),
-          parent = NULL
-        )
-      )
-      
-      while (length(path_queue)) {
-        item <- path_queue[[1L]]
-        path_queue <- path_queue[-1L]
-        values <- item$values
-        path_prefix <- item$prefix
-        parent <- item$parent
-        current_root <- parent
-        
-        if(!is.null(values$root)) {
-          current_root <- if (is.null(parent)){
-            values$root
-          } else {
-            file.path(parent, values$root)
-          }
-          opts[[paste(path_prefix, "root", sep = ".")]] <- current_root
-        }
-        
-        for(path_name in setdiff(names(values), "root")) {
-          value <- values[[path_name]]
-          option_name <- paste(path_prefix, path_name, sep = ".")
-          
-          if (is.list(value)) {
-            path_queue[[length(path_queue) + 1L]] <- list(
-              values = value, 
-              prefix = option_name, 
-              parent = current_root
-            )
-            
-          } else {
-            # Sluttverdien lagres som full sti.
-            opts[[option_name]] <- if (is.null(current_root)) {
-              value
-            } else {
-              file.path(current_root, value)
-            }
-          }
-        }
-      }
-      
-      # paths skal ikke behandles igjen som en vanlig configverdi.
-      config$paths <- NULL
+      config$paths <- build_paths(config$paths)
     }
     
-    if (length(config)) {
+    if(length(config)) {
       option_names <- paste(prefix, names(config), sep = ".")
       names(config) <- option_names
       opts[option_names] <- config
@@ -134,6 +86,36 @@ get_config_options <- function(config_files, dynamic_options = list(),
   }
   
   opts
+}
+
+build_paths <- function(paths, parent = NULL) {
+  
+  current_root <- parent
+  if(!is.null(paths$root)){
+    current_root <- if(is.null(parent)) {
+      paths$root
+    } else {
+      file.path(parent, paths$root)
+    }
+    paths$root <- current_root
+  }
+  
+  for(path_name in setdiff(names(paths), "root")) {
+    
+    if(is.list(paths[[path_name]])) {
+      paths[[path_name]] <- build_paths(
+        paths[[path_name]],
+        parent = current_root
+      )
+    } else {
+      paths[[path_name]] <- file.path(
+        current_root,
+        paths[[path_name]]
+      )
+    }
+  }
+  
+  paths
 }
 
 #' @title load_package_options
@@ -168,7 +150,7 @@ load_package_options <- function(config_files = NULL,
     architecture_options <- get_config_options(config_files = c(kh = "config-arkitektur.yml"),
                                                repo = repo,
                                                branch = branch)
-    architecture_options[["kh.dim.tab"]] <- get_all_tabdims(architecture_options[["kh.paths.database.khelsa"]])
+    architecture_options[["kh.dim.tab"]] <- get_all_tabdims(architecture_options[["kh.paths"]]$database$khelsa)
     package_opts <- architecture_options[["kh.package_opts"]][[package]]
     package_options <- list()
     
@@ -238,7 +220,7 @@ package_options_are_default <- function(package,
   
   default_options <- get_config_options(config_files = c(kh = "config-arkitektur.yml"), 
                                         repo = repo, branch = branch)
-  default_options[["kh.dim.tab"]] <- get_all_tabdims(default_options[["kh.paths.database.khelsa"]])
+  default_options[["kh.dim.tab"]] <- get_all_tabdims(default_options[["kh.paths"]]$database$khelsa)
   package_opts <- default_options[["kh.package_opts"]][[package]]
   
   if(length(package_opts)){
