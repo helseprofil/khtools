@@ -1,7 +1,7 @@
 # khtools (development version)
 
-
 NB: Denne utviklingsversjonen introduserer ny configinfrastruktur for KH-produksjonsapparatet. Endringene skal ikke tas inn i main før khfunctions, qualcontrol, orgdata og backend er tilpasset den nye strukturen.
+
 Ny configarkitektur
 
 - Felles KH-arkitektur skilles fra khtools-spesifikk konfigurasjon og lastes som kh.*-options.
@@ -20,6 +20,8 @@ khtools som generell hjelpepakke
 - connect_access() bruker komplett filsti og er frikoblet fra KH-spesifikke database-options.
 - KH-spesifikk filstruktur, databaseplassering og dimensjonsinformasjon flyttes ut av khtools.*.
 - Dette viderefører arbeidet med å gjøre khtools anvendelig også utenfor KH-produksjonsapparatet.
+
+- Alle tester tilpasset ny struktur
 
 # khtools 1.0.0 (2026-11-25)
 

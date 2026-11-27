@@ -1,4 +1,4 @@
-#' @title get_config_options
+#' @title config_get_options
 #' @description
 #' Leser én eller flere YAML-filer fra GitHub og returnerer et samlet,
 #' navngitt sett med options.
@@ -21,7 +21,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' get_config_options(
+#' config_get_options(
 #'   config_files = c(
 #'     khfunctions = "config-globals.yml",
 #'     khfunctions = "config-khfunctions.yml",
@@ -30,15 +30,14 @@
 #' )
 #' }
 #'
-#' @keywords internal
-#' @noRd
-get_config_options <- function(config_files, dynamic_options = list(), 
+#' @export
+config_get_options <- function(config_files, dynamic_options = list(), 
                                repo = "helseprofil/backend", branch = "main"){
   
   if(!is.character(config_files) || !length(config_files) ||
      is.null(names(config_files)) || any(!nzchar(names(config_files))) || 
      any(!nzchar(config_files))) {
-    stop("'config_files' må være en navngitt tegnvektor der navnene er prefix og verdiene er configfilnavn.",
+    stop("'config_files' m\u00e5 v\u00e6re en navngitt tegnvektor der navnene er prefix og verdiene er configfilnavn.",
          call. = FALSE)
   }
   
@@ -47,7 +46,7 @@ get_config_options <- function(config_files, dynamic_options = list(),
      any(!nzchar(names(dynamic_options))) || 
      !all(vapply(dynamic_options, is.function, logical(1L))))
     ){
-    stop("'dynamic_options' må være en navngitt liste med funksjoner.", call. = FALSE)
+    stop("'dynamic_options' m\u00e5 v\u00e6re en navngitt liste med funksjoner.", call. = FALSE)
   }
   
   root_url <- sprintf("https://raw.githubusercontent.com/%s/%s/config/", repo, branch)
@@ -64,7 +63,7 @@ get_config_options <- function(config_files, dynamic_options = list(),
     
     if(is.null(config)) next
     
-    if(!is.list(config)) stop("Configfilen må inneholde en navngitt YAML-liste: ",
+    if(!is.list(config)) stop("Configfilen m\u00e5 inneholde en navngitt YAML-liste: ",
                                config_url, call. = FALSE)
     
     if(is.null(names(config)) || any(!nzchar(names(config)))) stop("Configfilen inneholder verdier uten navn: ",
@@ -118,7 +117,7 @@ build_paths <- function(paths, parent = NULL) {
   paths
 }
 
-#' @title load_package_options
+#' @title config_load_package_options
 #' @description
 #' Leser options fra GitHub og setter dem i aktiv R-sesjon.
 #'
@@ -129,25 +128,25 @@ build_paths <- function(paths, parent = NULL) {
 #' Med `overwrite = TRUE` resettes alle aktuelle options til ferske verdier
 #' fra GitHub.
 #'
-#' @inheritParams get_config_options
+#' @inheritParams config_get_options
+#' @param package Navn på pakke. config-files leses da fra config-arkitektur.
 #' @param overwrite Skal eksisterende options overskrives?
 #' @return Usynlig navngitt liste med fasitverdiene som ble lest.
 #'
-#' @keywords internal
-#' @noRd
-load_package_options <- function(config_files = NULL,
-                                 package = NULL,
-                                 dynamic_options = list(), 
-                                 repo = "helseprofil/backend", 
-                                 branch = "main", 
-                                 overwrite = FALSE){
+#' @export
+config_load_package_options <- function(package = NULL,
+                                        config_files = NULL,
+                                        dynamic_options = list(), 
+                                        repo = "helseprofil/backend", 
+                                        branch = "main", 
+                                        overwrite = FALSE){
   
   if(is.null(config_files) == is.null(package)) {
     stop("Angi enten 'config_files' eller 'package', men ikke begge.", call. = FALSE)
   }
   
   if (!is.null(package)){
-    architecture_options <- get_config_options(config_files = c(kh = "config-arkitektur.yml"),
+    architecture_options <- config_get_options(config_files = c(kh = "config-arkitektur.yml"),
                                                repo = repo,
                                                branch = branch)
     architecture_options[["kh.dim.tab"]] <- get_all_tabdims(architecture_options[["kh.paths"]]$database$khelsa)
@@ -156,7 +155,7 @@ load_package_options <- function(config_files = NULL,
     
     if(length(package_opts)){
       package_config_files <- stats::setNames(package_opts, rep(package, length(package_opts)))
-      package_options <- get_config_options(config_files = package_config_files,
+      package_options <- config_get_options(config_files = package_config_files,
                                             repo = repo,
                                             branch = branch)
     }
@@ -177,7 +176,7 @@ load_package_options <- function(config_files = NULL,
     return(invisible(opts))
   }
     
-  opts <- get_config_options(config_files = config_files,
+  opts <- config_get_options(config_files = config_files,
                              dynamic_options = dynamic_options,
                              repo = repo,
                              branch = branch)
@@ -193,7 +192,7 @@ load_package_options <- function(config_files = NULL,
   invisible(opts)
 }
 
-#' @title package_options_are_default
+#' @title config_package_options_are_default
 #' @description
 #' Leser ferske standardoptions for en KH-pakke og sammenligner dem
 #' med options som er satt i aktiv R-sesjon.
@@ -211,21 +210,20 @@ load_package_options <- function(config_files = NULL,
 #' @return En logisk verdi. `TRUE` dersom aktive options er identiske
 #'   med ferske defaults, ellers `FALSE`.
 #'
-#' @keywords internal
-#' @noRd
-package_options_are_default <- function(package, 
+#' @export
+config_package_options_are_default <- function(package, 
                                         dynamic_options = list(),
                                         repo = "helseprofil/backend",
                                         branch = "main"){
   
-  default_options <- get_config_options(config_files = c(kh = "config-arkitektur.yml"), 
+  default_options <- config_get_options(config_files = c(kh = "config-arkitektur.yml"), 
                                         repo = repo, branch = branch)
   default_options[["kh.dim.tab"]] <- get_all_tabdims(default_options[["kh.paths"]]$database$khelsa)
   package_opts <- default_options[["kh.package_opts"]][[package]]
   
   if(length(package_opts)){
     package_config_files <- stats::setNames(package_opts, rep(package, length(package_opts)))
-    package_options <- get_config_options(config_files = package_config_files,
+    package_options <- config_get_options(config_files = package_config_files,
                                           repo = repo, branch = branch)
     default_options <- c(default_options, package_options)
   }
@@ -243,7 +241,9 @@ package_options_are_default <- function(package,
 #' @description Sjekker om en nyere versjon finnes på GitHub
 #' @keywords internal
 #' @noRd
-package_update_available <- function(package, branch = "main", owner = "helseprofil"){
+package_update_available <- function(package, 
+                                     branch = "main", 
+                                     owner = "helseprofil"){
   description <- suppressWarnings(utils::packageDescription(package))
   if(length(description) == 1L && is.na(description)) return(FALSE)
   
@@ -258,11 +258,15 @@ package_update_available <- function(package, branch = "main", owner = "helsepro
   numeric_version(github_version) > numeric_version(installed_version)
 }
 
-#' @title check_package_update
+#' @title config_check_package_update
+#' @param package Pakkenavn.
+#' @param branch GitHub-branchen som skal sjekkes.
+#' @param owner GitHub-organisasjon eller bruker som eier repositoryet.
 #' @description Gir brukeren anledning til å oppdatere pakker dersom ny versjon foreligger
-#' @keywords internal
-#' @noRd
-check_package_update <- function(package, branch = "main", owner = "helseprofil") {
+#' @export
+config_check_package_update <- function(package, 
+                                        branch = "main", 
+                                        owner = "helseprofil") {
   
   if(interactive() && 
      package_update_available(package = package, branch = branch, owner = owner)){
