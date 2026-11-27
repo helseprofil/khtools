@@ -1,30 +1,18 @@
-#' @keywords internal
-#' @noRd
-connect_access <- function(db_option){
-  path <- file.path(getOption("khtools.root"), getOption(db_option))
-  if(!file.exists(path)){
-    stop("Finner ikke databasefilen ", path)
+#' @title connect_access
+#' @description Kobler til en microsoft access-database
+#' @param path filsti til hvor databasen ligger
+#' @returns access connection
+#' @export
+connect_access <- function(path){
+  if (is.null(path)) {
+    stop("Path er ikke satt.", call. = FALSE)
   }
   
-  DBI::dbConnect(
-    odbc::odbc(),
-    .connection_string = sprintf(
-      "Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s;",
-      path
-    )
+  if (!file.exists(path)) {
+    stop("Finner ikke databasefilen ", path, call. = FALSE)
+  }
+  
+  DBI::dbConnect(odbc::odbc(), 
+                 .connection_string = sprintf("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s;", path)
   )
-}
-
-#' Koble til KHelsa-databasen
-#' @keywords internal
-#' @noRd
-connect_khelsa <- function(){
-  connect_access("khtools.db_khelsa")
-}
-
-#' Koble til geokoderdatabasen
-#' @keywords internal
-#' @noRd
-connect_geokoder <- function(){
-  connect_access("khtools.db_geo")
 }

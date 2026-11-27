@@ -1,6 +1,6 @@
 Package: khtools
 Title: Verktøy som brukes på tvers i produksjonsapparatet
-Version: 1.0.0
+Version: 1.0.0.9000
 Authors@R: 
     person("Vegard", "Lysne",, "vegard.lysne@helsedir.no", role = c("aut", "cre"))
 Description: Funksjoner som brukes på tvers av produksjonsapparatet.
