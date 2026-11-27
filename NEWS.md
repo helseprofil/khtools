@@ -1,17 +1,25 @@
 # khtools (development version)
 
-Konfigurasjon og options
 
-- Ny infrastruktur for lasting og validering av options fra YAML-konfigurasjon i backend-repositoryet.
-- Lagt til get_config_options() for å lese én eller flere configfiler fra GitHub med eksplisitte option-prefix. Dersom flere configfiler definerer samme option, vil senere filer overskrive tidligere verdier. Dette støtter gradvis flytting av felles options fra pakkespesifikke configfiler uten å bryte eksisterende pakker.
-- get_config_options() støtter dynamiske options som genereres på nytt ved innlesing.
-- Felles filstier kan nå defineres hierarkisk under paths i arkitekturconfig. Stiene bygges til komplette filstier og settes som individuelle options, for eksempel kh.paths.filgruppe.ny og kh.paths.database.khelsa.
-- Utvidet load_package_options() med støtte for KH-arkitekturen. For KH-pakker leses felles arkitektur først, før eventuelle pakke-spesifikke configfiler bestemmes fra kh.package_opts.
-- Pakkespesifikke configfiler er valgfrie. En pakke kan dermed bruke den felles KH-arkitekturen uten å ha egne configfiler.
-- Felles kh.*-options behandles som arkitektur og lastes fra config-arkitektur.yml, mens options som skal kunne overstyres per pakke fortsatt bruker pakke-prefix, for eksempel khfunctions.profileyear og qualcontrol.profileyear.
-- Lagt til package_options_are_default() for KH-pakker. Funksjonen genererer en fersk fasit fra GitHub, Access og eventuelle dynamiske options og kontrollerer om aktive session-options er identiske med denne.
-- khtools leser nå bare egne options fra config-khtools.yml. KH-spesifikke options som filstier og dimensjonsdefinisjoner flyttes ut av khtools.* og inn i den felles KH-arkitekturen.
-- khtools-options overskrives alltid med gjeldende defaults når pakken lastes. Dette sikrer blant annet at khtools.silent alltid resettes ved ny lasting av pakken.
+NB: Denne utviklingsversjonen introduserer ny configinfrastruktur for KH-produksjonsapparatet. Endringene skal ikke tas inn i main før khfunctions, qualcontrol, orgdata og backend er tilpasset den nye strukturen.
+Ny configarkitektur
+
+- Felles KH-arkitektur skilles fra khtools-spesifikk konfigurasjon og lastes som kh.*-options.
+- Filstier defineres sentralt og gjøres tilgjengelige som komplette paths, for eksempel kh.paths.filgruppe.ny og kh.paths.database.khelsa.
+- Pakkene kan hente listen over egne configfiler fra den felles arkitekturen. Dette gjør det mulig å bruke felles defaults fra config-globals.yml samtidig som eksisterende pakkespesifikke verdier beholdes under migreringen.
+- Pakkespesifikke configfiler er valgfrie. Nye KH-pakker kan derfor bruke kun den felles arkitekturen dersom de ikke trenger egne options.
+- Options som skal kunne variere mellom pakkene beholdes med pakke-prefix. Felles arkitektur skal derimot ikke dupliseres mellom pakkene.
+Validering og dynamiske options
+
+- Lagt til støtte for å sammenligne aktive package-options med en fersk fasit fra GitHub.
+- Dynamiske options kan inngå i samme validering.
+- TAB-dimensjoner leses dynamisk fra KHELSA og kan eksponeres som kh.dim.tab, slik at nye dimensjoner i Access oppdages uten manuell oppdatering av config.
+khtools som generell hjelpepakke
+
+- khtools initialiserer bare egne defaults fra config-khtools.yml.
+- connect_access() bruker komplett filsti og er frikoblet fra KH-spesifikke database-options.
+- KH-spesifikk filstruktur, databaseplassering og dimensjonsinformasjon flyttes ut av khtools.*.
+- Dette viderefører arbeidet med å gjøre khtools anvendelig også utenfor KH-produksjonsapparatet.
 
 # khtools 1.0.0 (2026-11-25)
 
